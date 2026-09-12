@@ -28,29 +28,55 @@ import {io} from "../app.js";
 //   }
 // };
 
-
-
-
 const getCoordinatesFromLocation = async (locationName, city) => {
   const query = `${locationName}, ${city}`;
-  const geocodingURL = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-    query
-  )}&format=json&limit=1`;
 
-  // IMPORTANT: User-Agent dena mandatory hai Nominatim ke liye
-  const response = await axios.get(geocodingURL, {
-    headers: {
-      "User-Agent": "serveease-app/1.0 (test@example.com)"
-    }
-  });
+  const geocodingURL =
+    `https://geocode.search.hereapi.com/v1/geocode` +
+    `?q=${encodeURIComponent(query)}` +
+    `&apiKey=${process.env.HERE_API_KEY}`;
 
-  if (response.data && response.data.length > 0) {
-    const { lat, lon } = response.data[0];
-    return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
-  } else {
-    throw new Error("Unable to get coordinates for the given location.");
+  const response = await axios.get(geocodingURL);
+
+  if (
+    response.data &&
+    response.data.items &&
+    response.data.items.length > 0
+  ) {
+    const position = response.data.items[0].position;
+
+    return {
+      latitude: position.lat,
+      longitude: position.lng,
+    };
   }
+
+  throw new Error(
+    "Unable to get coordinates for the given location."
+  );
 };
+
+// 2nd task  
+// const getCoordinatesFromLocation = async (locationName, city) => {
+//   const query = `${locationName}, ${city}`;
+//   const geocodingURL = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+//     query
+//   )}&format=json&limit=1`;
+
+//   // IMPORTANT: User-Agent dena mandatory hai Nominatim ke liye
+//   const response = await axios.get(geocodingURL, {
+//     headers: {
+//       "User-Agent": "serveease-app/1.0 (test@example.com)"
+//     }
+//   });
+
+//   if (response.data && response.data.length > 0) {
+//     const { lat, lon } = response.data[0];
+//     return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+//   } else {
+//     throw new Error("Unable to get coordinates for the given location.");
+//   }
+// };
 
 
 
